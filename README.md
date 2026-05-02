@@ -27,7 +27,14 @@ To run this application locally, follow these steps:
    
 3. Navigate to the project directory:
         cd cake-shop-management
-   
+
+4. Install the requirements
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip instal -r requirements.txt
+```
+
 5. Run the application:
         python main.py
 
@@ -41,5 +48,11 @@ To run this application locally, follow these steps:
 
 - Python
 - Console-based interface
+
+## Tests
+```bash
+python -m pytest
+```
+
 
 

@@ -3,6 +3,17 @@ import logo
 import cake
 import AdminLogin
 import UserLogin
+from transactions import (
+    CakeDoesNotExist,
+    CakeValuesAreValid,
+    AddCake,
+    CakeExists,
+    DeleteCake,
+    UpdateCake
+)
+from guara import application, it
+
+brain = application.Application()
 
 class CakeShop:
     def addCake(self):
@@ -13,11 +24,12 @@ class CakeShop:
             quantity = int(input("Number of Quantity: "))
             price = float(input("Enter cake price: "))
             CAKE_info = cake.Cake(cake_id, flavor, size, quantity, price)
-
-            with open("cakeData.txt", "a") as fp:
-                data = f"{CAKE_info.cake_id},{CAKE_info.flavor},{CAKE_info.size},{CAKE_info.quantity},{CAKE_info.price:.2f}"
-                fp.write(data)
-                fp.write("\n")
+            (
+                brain.given(CakeValuesAreValid, cake=CAKE_info)
+                .and_(CakeDoesNotExist, cake_id=CAKE_info.cake_id)
+                .when(AddCake, cake=CAKE_info)
+                .expects(it.IsTrue)
+            )
         except ValueError:
             print("Invalid Input...")
         except Exception as e:
@@ -70,20 +82,11 @@ class CakeShop:
         try:
             self.displayCake()
             cake_id = int(input("Enter cake id: "))
-            allCakes = []
-            found = False
-            with open("cakeData.txt", "r+") as fp:
-                for line in fp:
-                    data = line.split(",")
-                    if data[0] == str(cake_id):
-                        found = True
-                        print("Cake with ID {} has been deleted.".format(cake_id))
-                    else:
-                        allCakes.append(line)
-            with open("cakeData.txt", "w") as fp:
-                fp.write("".join(allCakes))
-            if not found:
-                print("Cake with ID {} not found.".format(cake_id))
+            (
+                brain.given(CakeExists, cake_id=cake_id)
+                .when(DeleteCake, cake_id=cake_id)
+                .then(it.IsTrue)
+            )
         except FileNotFoundError:
             print("An error occurred while deleting the Cake.")
         except Exception as e:
@@ -95,23 +98,12 @@ class CakeShop:
         try:
             self.displayCake()
             cake_id = int(input("Enter cake id: "))
-            allcake = []
-            found = False
-            with open("cakeData.txt", "r+") as fp:
-                for line in fp:
-                    data = line.split(",")
-                    if data[0] == str(cake_id):
-                        found = True
-                        print("Cake is found...")
-                        update_price = float(input("Enter a new price of Cake: "))
-                        data[4] = f"{update_price:.2f}"
-                    allcake.append(",".join(data))
-            if found:
-                print("Price of cake updated.")
-            else:
-                print("Cake with ID {} not found.".format(cake_id))
-            with open("cakeData.txt", "w") as fp:
-                fp.write("\n".join(allcake))
+            price = float(input("Enter a new price of Cake: "))
+            (
+                brain.given(CakeExists, cake_id=cake_id)
+                .when(UpdateCake, cake_id=cake_id, price=price)
+                .then(it.IsTrue)
+            )
         except FileNotFoundError:
             print("An error occurred while updating the Cake.")
         except Exception as e:

@@ -1,5 +1,11 @@
 from tabulate import tabulate
+from cake import Cake
 import logo
+from guara import application, it
+
+from transactions import AddToCart, CakeExists, CakeValuesAreValid, HasEnoughCake
+
+brain = application.Application()
 
 class cakeShopUser:
    
@@ -49,52 +55,18 @@ class cakeShopUser:
             try:
                 cake_id = int(input("Enter cake id: "))
                 quantity = int(input("Number of Quantity: "))
-            except ValueError:
-                print("Invalid Inputs...")
-                continue
+                cake_ = Cake(cake_id=cake_id, flavor="", size="s", quantity=quantity, price=0)
+                (
+                    brain.given(CakeExists, cake_id=cake_id)
+                    .and_(CakeValuesAreValid, cake=cake_)
+                    .and_(HasEnoughCake, cake_id=cake_.cake_id, quantity=cake_.quantity)
+                    .when(AddToCart,cake=cake_)
+                )
             except Exception as e:
                 print("An error occurred:", e)
-                continue
-
-            with open("cakeData.txt", "r") as fp:
-                data = fp.readlines()
-
-            cake_found = False
-            updated_cake_data = []  
-            cart_items = []  
-
-            for line in data:
-                cake_info = line.strip().split(",")
-                if cake_info[0] == str(cake_id):
-                    available_quantity = int(cake_info[3])
-                    if available_quantity >= quantity:
-                        cake_info[3] = str(available_quantity - quantity)
-                        total_price = float(cake_info[4]) * quantity
-                        cake_found = True
-                    else:
-                        print("Not enough quantity available for this cake.")
-                updated_cake_data.append(",".join(cake_info))
-
-            if cake_found:
-                with open("cakeData.txt", "w") as cake_file:
-                    cake_file.write("\n".join(updated_cake_data))
-
-                with open("add_to_cart_data.txt", "a") as cart_file:
-                    cart_item = [str(cake_id), cake_info[1], cake_info[2], str(quantity), f"{total_price:.2f}"]
-                    cart_file.write(",".join(cart_item))
-                    cart_file.write("\n")
-
-                try:
-                    add_cake = input("Do you want to add more cake (y or n)? ").lower()
-                except ValueError:
-                    print("Invalid Inputs...")
-                except:
-                    print("Error 404: Error not Found....")
-                else:
-                    if add_cake != "y":
-                        break
-            else:
-                print("Cake not found or quantity not available.")
+            add_cake = input("Do you want to add more cake (y or n)? ").lower()
+            if add_cake != "y":
+                break
 
     def edit_cart(self, user_id):
         try:
