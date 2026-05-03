@@ -1,9 +1,8 @@
 from tabulate import tabulate
-from cake import Cake
 import logo
 from guara import application, it
 
-from transactions import AddToCart, CakeExists, CakeValuesAreValid, HasEnoughCake
+from transactions import AddToCart, CakeExists, CartValuesAreValid, HasEnoughCake, UpdateCakeStock
 
 brain = application.Application()
 
@@ -55,12 +54,13 @@ class cakeShopUser:
             try:
                 cake_id = int(input("Enter cake id: "))
                 quantity = int(input("Number of Quantity: "))
-                cake_ = Cake(cake_id=cake_id, flavor="", size="s", quantity=quantity, price=0)
                 (
                     brain.given(CakeExists, cake_id=cake_id)
-                    .and_(CakeValuesAreValid, cake=cake_)
-                    .and_(HasEnoughCake, cake_id=cake_.cake_id, quantity=cake_.quantity)
-                    .when(AddToCart,cake=cake_)
+                    .and_(CartValuesAreValid, cake_id=cake_id, quantity=quantity)
+                    .and_(HasEnoughCake, cake_id=cake_id, quantity=quantity)
+                    .when(AddToCart, cake_id=cake_id, quantity=quantity)
+                    .when(UpdateCakeStock, with_operation="remove", cake_id=cake_id, quantity=quantity)
+                    .then(it.IsTrue)
                 )
             except Exception as e:
                 print("An error occurred:", e)

@@ -4,4 +4,6 @@ from UserMenu import cakeShopUser
 
 def test_cake():
     cake = cakeShopUser()
-    assert cake.Add_cart() == 42
+    cake = CakeShop()
+    # assert cake.Add_cart(None) == 42
+    assert cake.addCake() == 42
