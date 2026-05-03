@@ -136,7 +136,6 @@ class AddToCart(abstract_transaction.AbstractTransaction):
                     break
         with open("add_to_cart_data.txt", "a") as cart_file:
             total_price = float(cake_.price * cake_.quantity)
-            cart_item = [str(cake_.cake_id), cake_.flavor, cake_.size, str(cake_.quantity), f"{total_price:.2f}\n"]
-            for item in cart_item:
-                cart_file.write(item)
+            cart_item = f'{str(cake_.cake_id)},{cake_.flavor},{cake_.size},{str(cake_.quantity)},{total_price:.2f}\n'
+            cart_file.write(cart_item)
     
