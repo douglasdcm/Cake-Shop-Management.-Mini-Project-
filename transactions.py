@@ -111,9 +111,14 @@ class UpdateCakeStock(abstract_transaction.AbstractTransaction):
             for line in fp:
                 data = line.replace("\n", "").split(",")
                 if data[0] == str(cake_id):
-                    if quantity:
-                        new = int(data[3]) - quantity
-                        data[3] = str(new)
+                    if with_operation == "remove":
+                        if quantity:
+                            new = int(data[3]) - quantity
+                            data[3] = str(new)
+                    if with_operation == "add":
+                        if quantity:
+                            new = int(data[3]) + quantity
+                            data[3] = str(new)
                 allcake.append(",".join(data))
         with open("cakeData.txt", "w") as fp:
             for item in allcake:
@@ -131,7 +136,7 @@ class AddToCart(abstract_transaction.AbstractTransaction):
                     break
         with open("add_to_cart_data.txt", "a") as cart_file:
             total_price = float(cake_.price * cake_.quantity)
-            cart_item = [str(cake_.cake_id), cake_.flavor, cake_.size, str(cake_.quantity), f"{total_price:.2f}"]
+            cart_item = [str(cake_.cake_id), cake_.flavor, cake_.size, str(cake_.quantity), f"{total_price:.2f}\n"]
             for item in cart_item:
-                cart_file.write(f"{item}\n")
+                cart_file.write(item)
     
