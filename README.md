@@ -51,7 +51,7 @@ pip instal -r requirements.txt
 
 ## Tests
 ```bash
-python -m pytest
+python -m pytest -s
 ```
 
 

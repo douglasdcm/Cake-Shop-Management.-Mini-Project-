@@ -32,7 +32,7 @@ def addUser():
 
             new_user_data = f"{new_user_id},{new_password}"  
             with open("user_log.txt", "a") as user_file:
-                user_file.writelines(new_user_data)
+                user_file.write(new_user_data + "\n")
             print("User added successfully.")
             break
 
